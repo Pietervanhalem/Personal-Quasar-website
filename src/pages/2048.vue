@@ -39,8 +39,9 @@ window.onload = function() {
   spawnElement();
   var score = document.getElementById("score");
   score.innerHTML = `Score ${score_count}`;
-  document.onkeydown = logKey;
 };
+
+document.onkeydown = logKey;
 
 function reset() {
   score_count = 0;

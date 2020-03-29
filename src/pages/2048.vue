@@ -119,6 +119,7 @@ export default {
   text-align: justify;
   text-align: center
   border-radius: 10px;
+  background-color: black
 
 .tile2
   background-color: #f4f9ff

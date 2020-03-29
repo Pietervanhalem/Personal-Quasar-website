@@ -1,3 +1,44 @@
+function eventMessage(message) {
+    var page = document.getElementById("page")
+    var winscreen = document.createElement("div")
+    winscreen.setAttribute("class", "Winscreen")
+
+    var winmessage = document.createElement("div")
+    winmessage.setAttribute("class", "WinMessage")
+    winmessage.innerHTML = message
+
+    var winresest = document.createElement("div")
+    winresest.setAttribute("class", "Winreset row")
+
+    var resetButton = document.createElement("input")
+    resetButton.setAttribute("type", "button")
+    resetButton.value = "Reset"
+    resetButton.onclick = function () {
+        page.removeChild(winscreen)
+        page.removeChild(winmessage)
+        page.removeChild(winresest)
+        page.removeAttribute("visited")
+        reset()
+    }
+
+    var continueButton = document.createElement("input")
+    continueButton.setAttribute("type", "button")
+    continueButton.value = "Continue"
+    continueButton.onclick = function () {
+        page.removeChild(winscreen)
+        page.removeChild(winmessage)
+        page.removeChild(winresest)
+        page.removeAttribute("visited")
+    }
+
+    winresest.appendChild(continueButton)
+    winresest.appendChild(resetButton)
+    page.appendChild(winresest)
+    page.appendChild(winscreen)
+    page.appendChild(winmessage)
+    page.setAttribute("visited", "true")
+}
+
 function random_interger() {
     var value = 0
     for (var i = 0; i < 20; i++) {
@@ -106,43 +147,7 @@ export function moveTiles(direction, score_count) {
                     score.innerHTML = `Score ${score_count}`;
                     elements[element].removeChild(tile);
                     if (tile.innerHTML * 2 == 2048) {
-                        var winscreen = document.createElement("div")
-                        winscreen.setAttribute("class", "Winscreen")
-
-                        var winmessage = document.createElement("div")
-                        winmessage.setAttribute("class", "WinMessage")
-                        winmessage.innerHTML = "You have Won!"
-
-                        var winresest = document.createElement("div")
-                        winresest.setAttribute("class", "Winreset row")
-
-                        var resetButton = document.createElement("input")
-                        resetButton.setAttribute("type", "button")
-                        resetButton.value = "Reset"
-                        resetButton.onclick = function () {
-                            page.removeChild(winscreen)
-                            page.removeChild(winmessage)
-                            page.removeChild(winresest)
-                            page.removeAttribute("visited")
-                            reset()
-                        }
-
-                        var continueButton = document.createElement("input")
-                        continueButton.setAttribute("type", "button")
-                        continueButton.value = "Continue"
-                        continueButton.onclick = function () {
-                            page.removeChild(winscreen)
-                            page.removeChild(winmessage)
-                            page.removeChild(winresest)
-                            page.removeAttribute("visited")
-                        }
-
-                        winresest.appendChild(continueButton)
-                        winresest.appendChild(resetButton)
-                        page.appendChild(winresest)
-                        page.appendChild(winscreen)
-                        page.appendChild(winmessage)
-
+                        eventMessage("You have won!")
                     }
                     break;
                 }
@@ -166,43 +171,7 @@ export function moveTiles(direction, score_count) {
         }
 
         if (dead) {
-            var winscreen = document.createElement("div")
-            winscreen.setAttribute("class", "Winscreen")
-
-            var winmessage = document.createElement("div")
-            winmessage.setAttribute("class", "WinMessage")
-            winmessage.innerHTML = "you are dead!"
-
-            var winresest = document.createElement("div")
-            winresest.setAttribute("class", "Winreset row")
-
-            var resetButton = document.createElement("input")
-            resetButton.setAttribute("type", "button")
-            resetButton.value = "Reset"
-            resetButton.onclick = function () {
-                page.removeChild(winscreen)
-                page.removeChild(winmessage)
-                page.removeChild(winresest)
-                page.removeAttribute("visited")
-                reset()
-            }
-
-            var continueButton = document.createElement("input")
-            continueButton.setAttribute("type", "button")
-            continueButton.value = "Continue"
-            continueButton.onclick = function () {
-                page.removeChild(winscreen)
-                page.removeChild(winmessage)
-                page.removeChild(winresest)
-                page.removeAttribute("visited")
-            }
-
-            winresest.appendChild(continueButton)
-            winresest.appendChild(resetButton)
-            page.appendChild(winresest)
-            page.appendChild(winscreen)
-            page.appendChild(winmessage)
-            page.setAttribute("visited", "true")
+            eventMessage("you have lost!")
         }
     }
     return score_count

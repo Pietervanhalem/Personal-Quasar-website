@@ -36,11 +36,55 @@
         <q-btn label="Submit" type="submit" color="primary" />
       </div>
     </q-form>
+    <div id="remainingBombs"></div>
     <div id="container" class="container row" />
   </div>
 </template>
 
 <script>
+var remainingBombsCount = 0;
+function eventMessage(message, N, B) {
+  var page = document.getElementById("container");
+
+  var winscreen = document.createElement("div");
+  winscreen.setAttribute("class", "Winscreen");
+
+  var winmessage = document.createElement("div");
+  winmessage.setAttribute("class", "WinMessage");
+  winmessage.innerHTML = message;
+
+  var winresest = document.createElement("div");
+  winresest.setAttribute("class", "Winreset row");
+
+  var resetButton = document.createElement("input");
+  resetButton.setAttribute("type", "button");
+  resetButton.value = "Reset";
+  resetButton.onclick = function() {
+    page.removeChild(winscreen);
+    page.removeChild(winmessage);
+    page.removeChild(winresest);
+    page.removeAttribute("visited");
+    createGrid(N, B);
+  };
+
+  var continueButton = document.createElement("input");
+  continueButton.setAttribute("type", "button");
+  continueButton.value = "Continue";
+  continueButton.onclick = function() {
+    page.removeChild(winscreen);
+    page.removeChild(winmessage);
+    page.removeChild(winresest);
+    page.removeAttribute("visited");
+  };
+
+  winresest.appendChild(continueButton);
+  winresest.appendChild(resetButton);
+  page.appendChild(winresest);
+  page.appendChild(winscreen);
+  page.appendChild(winmessage);
+  page.setAttribute("visited", "true");
+}
+
 document.body.onload = function() {
   console.log("test");
   createGrid(15, 20);
@@ -79,10 +123,8 @@ function getBombs(N, B) {
 
 function getContent(bombs, id, N, B) {
   if (bombs.includes(id)) {
-    if (confirm("You have lost :( want to start again?")) {
-      createGrid(N, B);
-    }
-
+    var div = document.getElementById("images");
+    eventMessage("You have lost :(", N, B);
     return "B";
   } else {
     var edge = Math.floor(id / N);
@@ -107,7 +149,7 @@ function getContent(bombs, id, N, B) {
 
 function clickedElement(id, bombs, N, B) {
   var elementBox = document.getElementById(id);
-  if (elementBox.textContent == "x") {
+  if (elementBox.hasAttribute("marked")) {
     return;
   }
 
@@ -119,8 +161,15 @@ function clickedElement(id, bombs, N, B) {
   var content = getContent(bombs, id, N, B);
   if (content == 0) {
     clickAround(id, bombs, N, B);
+  } else if (content == "B") {
+    var img = document.createElement("img");
+    img.src = "../statics/icons/bomb.png";
+    img.width = 22;
+    img.height = 22;
+    newElement.appendChild(img);
   } else {
     newElement.innerHTML = content;
+    newElement.setAttribute("class", `tile${content}`);
   }
 
   elementBox.removeChild(elementBox.childNodes[0]);
@@ -128,20 +177,28 @@ function clickedElement(id, bombs, N, B) {
 }
 
 function markedElement(e, bombs, N, B) {
-  if (e.toElement.textContent == "x") {
-    e.toElement.textContent = "";
+  if (e.toElement.hasAttribute("marked")) {
+    remainingBombsCount = remainingBombsCount + 1;
+    var remainingBombs = document.getElementById("remainingBombs");
+    remainingBombs.innerHTML = `Remaining Bombs: ${remainingBombsCount}`;
+    e.toElement.removeAttribute("marked");
+    e.toElement.setAttribute("class", "box");
   } else {
-    e.toElement.textContent = "x";
+    remainingBombsCount = remainingBombsCount - 1;
+    var remainingBombs = document.getElementById("remainingBombs");
+    remainingBombs.innerHTML = `Remaining Bombs: ${remainingBombsCount}`;
+    e.toElement.setAttribute("marked", "true");
+    e.toElement.setAttribute("class", "boxmarked");
   }
-  checkVictory(bombs, N);
+  checkVictory(bombs, N, B);
 }
 
-function checkVictory(bombs, N) {
+function checkVictory(bombs, N, B) {
   var victory = true;
   for (var i = 0; i < N * N; i++) {
     var element = document.getElementById(`${i}`);
     if (bombs.includes(i)) {
-      if (element.textContent != "x") {
+      if (element.hasAttribute("marked")) {
         victory = false;
       }
     } else if (element.hasAttribute("beenClicked") == false) {
@@ -149,9 +206,7 @@ function checkVictory(bombs, N) {
     }
   }
   if (victory) {
-    if (confirm("You have won :) want to start again?")) {
-      createGrid(N, B);
-    }
+    eventMessage("You have won :)", N, B);
   }
 }
 
@@ -172,6 +227,10 @@ function createGrid(N, B) {
   document.getElementById("container").style.height = `${50 + 22 * N}px`;
   document.getElementById("container").style.width = `${50 + 22 * N}px`;
 
+  var remainingBombs = document.getElementById("remainingBombs");
+  remainingBombsCount = B;
+  remainingBombs.innerHTML = `Remaining Bombs: ${B}`;
+
   for (var i = 0; i < N * N; i++) {
     var element = document.createElement("div");
     var elementButton = document.createElement("button");
@@ -182,7 +241,7 @@ function createGrid(N, B) {
     elementButton.onclick = function(e) {
       var id = e.toElement.parentElement.id;
       clickedElement(id, bombs, N, B);
-      checkVictory(bombs, N);
+      checkVictory(bombs, N, B);
     };
     elementButton.oncontextmenu = function(e) {
       markedElement(e, bombs, N, B);
@@ -210,6 +269,43 @@ export default {
 </script>
 
 <style>
+.Winscreen {
+  width: 100%;
+  height: 100%;
+  opacity: 0.4;
+  background-color: grey;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 100;
+}
+
+.WinMessage {
+  width: 800px;
+  height: 200px;
+  background-color: #004ba1;
+  position: absolute;
+  opacity: 0.85;
+  top: 300px;
+  left: 100px;
+  z-index: 101;
+  text-align: justify;
+  text-align: center;
+  line-height: 150px;
+  font-size: 400%;
+  color: white;
+  border-radius: 50px;
+  border-style: solid;
+  border-width: 5px;
+}
+
+.Winreset {
+  position: absolute;
+  top: 450px;
+  left: 410px;
+  z-index: 102;
+  font-size: 150%;
+}
 .container {
   padding-left: 50px;
   padding-top: 10px;
@@ -221,8 +317,82 @@ export default {
   background-color: lightgrey;
   text-align: justify;
   text-align: center;
+  padding-left: 0px;
+  padding-right: 0px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  margin-bottom: 0px;
+}
+
+.boxmarked {
+  width: 22px;
+  height: 22px;
+  background: url(../statics/icons/flag.png);
+  text-align: justify;
+  text-align: center;
+  padding-left: 0px;
+  padding-right: 0px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  margin-bottom: 0px;
 }
 .boxClicked {
+  width: 22px;
+  height: 22px;
+  background-color: white;
+  text-align: justify;
+  text-align: center;
+  padding-left: 0px;
+  padding-right: 0px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  margin-bottom: 0px;
+}
+
+.tile1 {
+  color: black;
+  width: 22px;
+  height: 22px;
+  background-color: white;
+  text-align: justify;
+  text-align: center;
+  padding-left: 0px;
+  padding-right: 0px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  margin-bottom: 0px;
+}
+.tile2 {
+  color: green;
+  font-weight: bold;
+  width: 22px;
+  height: 22px;
+  background-color: white;
+  text-align: justify;
+  text-align: center;
+  padding-left: 0px;
+  padding-right: 0px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  margin-bottom: 0px;
+}
+.tile3 {
+  color: blue;
+  font-weight: 900;
+  width: 22px;
+  height: 22px;
+  background-color: white;
+  text-align: justify;
+  text-align: center;
+  padding-left: 0px;
+  padding-right: 0px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  margin-bottom: 0px;
+}
+.tile4 {
+  color: red;
+  font-weight: 900;
   width: 22px;
   height: 22px;
   background-color: white;

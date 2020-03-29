@@ -14,6 +14,7 @@
       <q-tabs align="left">
         <q-route-tab to="/" label="Home" />
         <q-route-tab to="/simpleAPIForm" label="Simple API Form" />
+        <q-route-tab to="/multiPageForm" label="multiPageForm" />
         <q-route-tab to="/2048" label="2048" />
         <q-route-tab to="/minesweeper" label="minesweeper" />
       </q-tabs>

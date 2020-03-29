@@ -7,7 +7,8 @@ const routes = [
       { path: '', component: () => import('pages/Index.vue') },
       { path: 'simpleAPIForm', component: () => import('pages/simpleAPIForm.vue') },
       { path: '2048', component: () => import('pages/2048.vue') },
-      { path: 'minesweeper', component: () => import('pages/minesweeper.vue') }
+      { path: 'minesweeper', component: () => import('pages/minesweeper.vue') },
+      { path: 'multiPageForm', component: () => import('pages/multiPageFrom.vue') }
     ]
   }
 ]

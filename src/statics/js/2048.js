@@ -1,7 +1,18 @@
+function random_interger() {
+    var value = 0
+    for (var i = 0; i < 20; i++) {
+        value = value + Math.random()
+    }
+    value = 2 ** -(0.6 * value)
+    return Math.ceil(value * 50)
+}
+
+
+
 export function spawnElement() {
     var tile = document.createElement("div");
     tile.setAttribute("data-v-04d01ec6", null);
-    var value = 2 ** Math.ceil(Math.random() * 2)
+    var value = 2 ** random_interger()
     tile.innerHTML = value;
     tile.setAttribute("class", `tile tile${value}`);
 
@@ -11,12 +22,7 @@ export function spawnElement() {
         if (element.childNodes[i].childNodes.length == 0) {
             elements.push(element.childNodes[i]);
         }
-    if (elements.length == 0) {
-        var dead = checkIfDead()
-        if (dead) {
-            alert("you are dead!")
-        }
-    } else {
+    if (elements.length > 0) {
         var block_id = Math.floor(Math.random() * elements.length);
         var block = elements[block_id];
         tile.id = block.id;
@@ -25,6 +31,7 @@ export function spawnElement() {
 };
 
 export function moveTiles(direction, score_count) {
+    var moved = false
     var element = document.getElementById("row");
     var elements = [];
     for (var i = 0; i < element.childNodes.length; ++i)
@@ -57,6 +64,7 @@ export function moveTiles(direction, score_count) {
                 elements[element].removeChild(tile);
                 tile.id = newElement.id;
                 newElement.appendChild(tile);
+                moved = true
                 break;
             } else if (newElement.childNodes[0].id == elements[element].id) {
                 break;
@@ -88,6 +96,7 @@ export function moveTiles(direction, score_count) {
                 }
 
                 if (condition) {
+                    moved = true
                     newElement.childNodes[0].innerHTML = tile.innerHTML * 2;
                     newElement.childNodes[0].setAttribute(
                         "class",
@@ -97,15 +106,120 @@ export function moveTiles(direction, score_count) {
                     score.innerHTML = `Score ${score_count}`;
                     elements[element].removeChild(tile);
                     if (tile.innerHTML * 2 == 2048) {
-                        alert("Congratulations you have won!")
+                        var winscreen = document.createElement("div")
+                        winscreen.setAttribute("class", "Winscreen")
+
+                        var winmessage = document.createElement("div")
+                        winmessage.setAttribute("class", "WinMessage")
+                        winmessage.innerHTML = "You have Won!"
+
+                        var winresest = document.createElement("div")
+                        winresest.setAttribute("class", "Winreset row")
+
+                        var resetButton = document.createElement("input")
+                        resetButton.setAttribute("type", "button")
+                        resetButton.value = "Reset"
+                        resetButton.onclick = function () {
+                            page.removeChild(winscreen)
+                            page.removeChild(winmessage)
+                            page.removeChild(winresest)
+                            page.removeAttribute("visited")
+                            reset()
+                        }
+
+                        var continueButton = document.createElement("input")
+                        continueButton.setAttribute("type", "button")
+                        continueButton.value = "Continue"
+                        continueButton.onclick = function () {
+                            page.removeChild(winscreen)
+                            page.removeChild(winmessage)
+                            page.removeChild(winresest)
+                            page.removeAttribute("visited")
+                        }
+
+                        winresest.appendChild(continueButton)
+                        winresest.appendChild(resetButton)
+                        page.appendChild(winresest)
+                        page.appendChild(winscreen)
+                        page.appendChild(winmessage)
+
                     }
                     break;
                 }
             }
         }
     }
+    if (moved) {
+        spawnElement();
+    }
+    var element = document.getElementById("row");
+    var elements = [];
+    for (var i = 0; i < element.childNodes.length; ++i)
+        if (element.childNodes[i].childNodes.length == 0) {
+            elements.push(element.childNodes[i]);
+        }
+    if (elements.length == 0) {
+        var dead = checkIfDead()
+        var page = document.getElementById("page")
+        if (page.hasAttribute("visited")) {
+            dead = false
+        }
+
+        if (dead) {
+            var winscreen = document.createElement("div")
+            winscreen.setAttribute("class", "Winscreen")
+
+            var winmessage = document.createElement("div")
+            winmessage.setAttribute("class", "WinMessage")
+            winmessage.innerHTML = "you are dead!"
+
+            var winresest = document.createElement("div")
+            winresest.setAttribute("class", "Winreset row")
+
+            var resetButton = document.createElement("input")
+            resetButton.setAttribute("type", "button")
+            resetButton.value = "Reset"
+            resetButton.onclick = function () {
+                page.removeChild(winscreen)
+                page.removeChild(winmessage)
+                page.removeChild(winresest)
+                page.removeAttribute("visited")
+                reset()
+            }
+
+            var continueButton = document.createElement("input")
+            continueButton.setAttribute("type", "button")
+            continueButton.value = "Continue"
+            continueButton.onclick = function () {
+                page.removeChild(winscreen)
+                page.removeChild(winmessage)
+                page.removeChild(winresest)
+                page.removeAttribute("visited")
+            }
+
+            winresest.appendChild(continueButton)
+            winresest.appendChild(resetButton)
+            page.appendChild(winresest)
+            page.appendChild(winscreen)
+            page.appendChild(winmessage)
+            page.setAttribute("visited", "true")
+        }
+    }
     return score_count
 };
+
+export function reset() {
+    var score_count = 0;
+    score.innerHTML = `Score ${score_count}`;
+    var parentElement = document.getElementById("row");
+    for (var i = 0; i < parentElement.childNodes.length; i++) {
+        var element = parentElement.childNodes[i];
+        if (element.childNodes.length == 1) {
+            element.removeChild(element.childNodes[0]);
+        }
+    }
+    spawnElement()
+}
 
 function checkIfDead() {
     var element = document.getElementById("row");
@@ -125,6 +239,7 @@ function checkIfDead() {
     }
     return true
 }
+
 function index(element, i, j) {
     if (i > 4 | i < 0 | j < 0 | j > 4) {
         return null

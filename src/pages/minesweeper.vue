@@ -1,5 +1,5 @@
 <template>
-  <div id="displayDiv">
+  <div id="displayDiv" class="container">
     <q-form @submit="trigger" class="q-gutter-md">
       <div class="row">
         <div>
@@ -41,6 +41,11 @@
 </template>
 
 <script>
+document.body.onload = function() {
+  console.log("test");
+  createGrid(15, 20);
+};
+
 function clickAround(id, bombs, N, B) {
   var edge = Math.floor(id / N);
   var edgeId = id - edge * N;
@@ -56,7 +61,7 @@ function clickAround(id, bombs, N, B) {
     var newId = `${id + iter[i]}`;
     var elementBox = document.getElementById(newId);
     if (elementBox == null) {
-      return;
+      null;
     } else if (elementBox.hasAttribute("beenClicked") == false) {
       clickedElement(newId, bombs, N, B);
     }
@@ -192,8 +197,8 @@ function createGrid(N, B) {
 export default {
   data() {
     return {
-      N: null,
-      B: null
+      N: 15,
+      B: 20
     };
   },
   methods: {
@@ -221,9 +226,6 @@ export default {
   width: 22px;
   height: 22px;
   background-color: white;
-  /* border-color: grey;
-  border-width: 0.5px;
-  border-style: solid; */
   text-align: justify;
   text-align: center;
   padding-left: 0px;
